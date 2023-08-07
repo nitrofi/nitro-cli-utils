@@ -8,6 +8,9 @@
   "bin": {
     "nitro-cli": "dist/index.js"
   },
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "lint": "tsc",
     "build": "tsup src/index.ts --format esm",
@@ -17,18 +20,18 @@
     "create-release": "changeset"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.26.0",
+    "@changesets/cli": "^2.26.2",
     "@types/figlet": "^1.5.6",
     "@types/inquirer": "^9.0.3",
-    "tsup": "^6.5.0",
-    "typescript": "^4.9.4"
+    "tsup": "^7.2.0",
+    "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@inquirer/prompts": "^3.0.1",
-    "chalk": "^4.0.0",
+    "@inquirer/prompts": "^3.0.2",
+    "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
-    "inquirer": "^8.2.6",
+    "inquirer": "^9.2.10",
     "terminal-link": "^3.0.0"
   }
 }
