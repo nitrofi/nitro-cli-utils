@@ -29,7 +29,8 @@ Steps for contributing through a pull request:
 - Fork `main` on Github and clone fork locally
 - Install dependencies
   - `npm ci`
-- Make changes
+- `npm run dev` to build changes
+- `npm run start` to run the CLI
 - Once all changes are complete, create a new release with [changesets](https://github.com/changesets/changesets)
   - `npm run create-release`
 - Commit and push changes to fork

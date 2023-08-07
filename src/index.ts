@@ -195,7 +195,7 @@ async function main() {
 
   logger.success(`************
 
-This is a collection of CLI utils used at ${nitro}
+This is a collection of CLI utils used at ${nitro} 🔥
 
 ************
   `)
