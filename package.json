@@ -8,6 +8,9 @@
   "bin": {
     "nitro-cli": "dist/index.js"
   },
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "lint": "tsc",
     "build": "tsup src/index.ts --format esm",
