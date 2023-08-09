@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.3
+
+### Patch Changes
+
+- 63775b5: add better typed story args
+
 ## 0.0.2
 
 ### Patch Changes
