@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.4
+
+### Patch Changes
+
+- 56196fa: better story typing
+
 ## 0.0.3
 
 ### Patch Changes
