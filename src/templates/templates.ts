@@ -47,15 +47,12 @@ const meta: Meta<typeof ${componentName}> = {
 
 export default meta
 
-/**
- * Use this export when composing stories for correct types (StoryObj infers incorrect types)
- */
-export const DefaultArgs: ${componentName}Props = {}
-
 type Story = StoryObj<typeof ${componentName}>
 
-export const Default: Story = {
-  args: DefaultArgs
+export const Default: Story { args: ${componentName}Props }  = {
+  args: {
+    
+  }
 }
 
 Default.parameters = {
