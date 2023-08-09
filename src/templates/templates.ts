@@ -37,7 +37,7 @@ export const uiComponenentStoryTemplate = ({
   componentName: string
 }) => `
 import { Meta, StoryObj } from '@storybook/react'
-import { ${componentName} } from '../${componentName}'
+import { ${componentName}, ${componentName}Props } from '../${componentName}'
 
 const meta: Meta<typeof ${componentName}> = {
   title: 'ui/${componentName}',
@@ -47,12 +47,15 @@ const meta: Meta<typeof ${componentName}> = {
 
 export default meta
 
+/**
+ * Use this export when composing stories for correct types (StoryObj infers incorrect types)
+ */
+export const DefaultArgs: ${componentName}Props = {}
+
 type Story = StoryObj<typeof ${componentName}>
 
 export const Default: Story = {
-  args: {
-
-  },
+  args: DefaultArgs
 }
 
 Default.parameters = {
