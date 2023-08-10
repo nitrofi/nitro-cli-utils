@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.15
+
+### Patch Changes
+
+- ecf9887: small change to test self-update
+
 ## 0.0.14
 
 ### Patch Changes

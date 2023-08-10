@@ -2,7 +2,7 @@
   "name": "@nitrofi/cli-utils",
   "description": "Nitro CLI utilities",
   "license": "MIT",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "private": false,
   "type": "module",
   "bin": {
