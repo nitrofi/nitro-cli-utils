@@ -1,29 +1,21 @@
 #!/usr/bin/env node
-import { checkbox, confirm, input } from "@inquirer/prompts"
-import { logger } from "./utils/logger"
-import {
-  cssModuleTemplate,
-  datoBlockFragmentTemplate,
-  datoBlockTemplate,
-  uiComponenentStoryTemplate,
-  uiComponenentTemplate,
-} from "./templates/templates"
-import fs from "fs-extra"
-import path from "path"
+import { checkbox } from "@inquirer/prompts"
+import { spawn } from "child_process"
+import { program } from "commander"
 import figlet from "figlet"
 import terminalLink from "terminal-link"
-import { exec, ExecException, spawn } from "child_process"
-import semver from "semver"
-import ora from "ora"
-import { toLowerCaseFirstLetter } from "./utils/utils"
-import { program } from "commander"
+import { PACKAGE_NAME } from "./constants/constants"
+import { createDatoBlockScaffold } from "./utils/datoComponentScaffold"
+import {
+  checkForNewerVersion,
+  checkInstalledGlobalPackageVersion,
+  logger,
+} from "./utils/utils"
 
 type CLIProcesses = "dato-block-scaffold" | "new-process"
 
-const PACKAGE_NAME = "@nitrofi/cli-utils"
-
-const promptCLIProcesses = async (): Promise<CLIProcesses[]> =>
-  checkbox({
+async function promptCLIProcesses(): Promise<CLIProcesses[]> {
+  return checkbox({
     message: "Which CLI utilities would you like to run?",
     choices: [
       {
@@ -38,283 +30,10 @@ const promptCLIProcesses = async (): Promise<CLIProcesses[]> =>
       },
     ],
   })
-
-type DatoComponentFiles =
-  | "dato-block"
-  | "ui-component"
-  | "css-module"
-  | "graphql-fragment"
-  | "storybook-story"
-
-const promptDatoComponentFiles = async (): Promise<DatoComponentFiles[]> =>
-  checkbox({
-    message: "Which Dato component files would you like to create?",
-    choices: [
-      {
-        name: "Dato block",
-        value: "dato-block",
-        checked: true,
-      },
-      {
-        name: "UI component",
-        value: "ui-component",
-        checked: true,
-      },
-      {
-        name: "CSS module",
-        value: "css-module",
-        checked: true,
-      },
-      {
-        name: "GraphQL fragment",
-        value: "graphql-fragment",
-        checked: true,
-      },
-      {
-        name: "Storybook story",
-        value: "storybook-story",
-        checked: true,
-      },
-    ],
-  })
-
-const promptUseDefaultPaths = async () => {
-  const useDefaultPaths = await confirm({
-    message: "Use default paths for component files?",
-  })
-  if (!useDefaultPaths) logger.warn("Custom file paths not supported!")
-}
-
-const promptUpdatePackage = async () =>
-  await confirm({
-    message: "Do you want to update package to latest version?",
-  })
-
-const promptComponentName = async () => {
-  const userInput = () =>
-    input({
-      message: "Input component name in PascalCase",
-    })
-
-  let componentNameInput = await userInput()
-
-  const pascalCaseRegExp = new RegExp(/^[A-Z][A-Za-z]*$/)
-
-  while (!pascalCaseRegExp.test(componentNameInput)) {
-    logger.error("Name not PascalCase. Try again!")
-
-    componentNameInput = await userInput()
-  }
-
-  return componentNameInput
-}
-
-export function writeLocalFile({
-  filePath,
-  data,
-}: {
-  filePath: string
-  data: string | Buffer
-}) {
-  fs.writeFileSync(path.join(process.cwd(), filePath), data, "utf-8")
-}
-
-export function createFolder({ folderPath }: { folderPath: string }) {
-  fs.mkdirSync(path.join(process.cwd(), folderPath), { recursive: true })
-}
-
-async function createDatoBlockScaffold() {
-  const datoComponents = await promptDatoComponentFiles()
-
-  const hasCssModule = datoComponents.includes("css-module")
-
-  await promptUseDefaultPaths()
-
-  let componentName = await promptComponentName()
-
-  datoComponents.forEach((component) => {
-    switch (component) {
-      case "dato-block": {
-        const template = datoBlockTemplate({ componentName })
-
-        const folderPath = `src/components/blocks/DatoBlock${componentName}`
-        createFolder({
-          folderPath,
-        })
-
-        const filePath = `${folderPath}/DatoBlock${componentName}.tsx`
-        writeLocalFile({
-          filePath,
-          data: template,
-        })
-
-        logger.success(`✅ ${filePath}`)
-        break
-      }
-      case "ui-component": {
-        const template = uiComponenentTemplate({ componentName, hasCssModule })
-
-        const folderPath = `src/components/ui/${componentName}`
-        createFolder({
-          folderPath,
-        })
-
-        const filePath = `${folderPath}/${componentName}.tsx`
-        writeLocalFile({
-          filePath,
-          data: template,
-        })
-
-        logger.success(`✅ ${filePath}`)
-        break
-      }
-      case "storybook-story": {
-        const template = uiComponenentStoryTemplate({ componentName })
-
-        const folderPath = `src/components/ui/${componentName}/stories`
-        createFolder({
-          folderPath,
-        })
-
-        const filePath = `${folderPath}/${componentName}.stories.tsx`
-        writeLocalFile({
-          filePath,
-          data: template,
-        })
-
-        logger.success(`✅ ${filePath}`)
-        break
-      }
-      case "graphql-fragment": {
-        const template = datoBlockFragmentTemplate({ componentName })
-
-        const folderPath = `src/graphql/dato/operations/queries/fragments`
-        createFolder({
-          folderPath,
-        })
-
-        const filePath = `${folderPath}/${componentName}.fragment.graphql`
-        writeLocalFile({
-          filePath,
-          data: template,
-        })
-
-        logger.success(`✅ ${filePath}`)
-        break
-      }
-      case "css-module": {
-        const template = cssModuleTemplate({ componentName })
-
-        const folderPath = `src/components/ui/${componentName}`
-        createFolder({
-          folderPath,
-        })
-
-        const filePath = `${folderPath}/${toLowerCaseFirstLetter(
-          componentName
-        )}.module.css`
-        writeLocalFile({
-          filePath,
-          data: template,
-        })
-
-        logger.success(`✅ ${filePath}`)
-        break
-      }
-    }
-  })
-}
-
-async function terminalPrompt(prompt: string): Promise<ExecException | string> {
-  return await new Promise((resolve, reject) => {
-    exec(prompt, (error, stdout, stderr) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(stdout)
-      }
-    })
-  })
-}
-
-async function getNPMPackageVersion() {
-  return await terminalPrompt(`npm view ${PACKAGE_NAME} version`)
-}
-
-async function updatePackage(): Promise<{ success: boolean }> {
-  const spinner = ora(`Updating ${PACKAGE_NAME}`).start()
-
-  const updatePrompt = await terminalPrompt(`npm i -g ${PACKAGE_NAME}`)
-  spinner.stop()
-  console.log(updatePrompt)
-
-  if (typeof updatePrompt !== "string")
-    return {
-      success: false,
-    }
-
-  return { success: true }
-}
-
-async function checkForNewerVersion({ skip }: { skip: boolean }): Promise<{
-  newPackageInstalled: boolean
-}> {
-  if (skip) return { newPackageInstalled: false }
-
-  const locallyInstalledGlobalVersion =
-    await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
-
-  if (typeof locallyInstalledGlobalVersion !== "string")
-    return { newPackageInstalled: false }
-
-  const updateCheckSpinner = ora(
-    `Checking for package updates from NPM`
-  ).start()
-
-  const packageVersionFromNpm = await getNPMPackageVersion()
-
-  updateCheckSpinner.stop()
-
-  logger.info(`Latest version available from NPM: ${packageVersionFromNpm}`)
-
-  if (typeof packageVersionFromNpm !== "string")
-    return { newPackageInstalled: false }
-
-  const newerPackageAvailableFromNPM = semver.lt(
-    locallyInstalledGlobalVersion,
-    packageVersionFromNpm
-  )
-
-  if (!newerPackageAvailableFromNPM) return { newPackageInstalled: false }
-
-  logger.info("Newer package version available from NPM")
-
-  const updatePrompt = await promptUpdatePackage()
-  if (!updatePrompt) return { newPackageInstalled: false }
-
-  const { success } = await updatePackage()
-
-  if (!success) return { newPackageInstalled: false }
-
-  return { newPackageInstalled: true }
-}
-
-async function checkInstalledGlobalPackageVersion(packageName: string) {
-  const grepResult = await terminalPrompt(
-    `npm list --depth=0 -g | grep  ${packageName}`
-  )
-
-  if (typeof grepResult !== "string") return
-
-  const semverPattern = new RegExp(/[0-9\.]+/)
-  const version = grepResult.match(semverPattern)?.[0]
-
-  if (typeof version !== "string") return
-
-  return version
 }
 
 async function main() {
+  // CLI flags
   program.option("--updated")
   program.parse()
 
