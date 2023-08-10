@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.12
+
+### Patch Changes
+
+- ac99fa8: add update cli flag
+
 ## 0.0.11
 
 ### Patch Changes
