@@ -353,7 +353,7 @@ async function main() {
     logger.success(`
 ************
   
-This is a collection of CLI utils used at ${nitro} 🔥
+This is a CLI utility collection used at ${nitro}.
 Locally installed package version: ${globalVersion}
   
 ************
