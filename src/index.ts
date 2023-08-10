@@ -200,22 +200,37 @@ async function terminalPrompt(prompt: string) {
   })
 }
 
-async function checkForNewerVersion({ skip }: { skip: boolean }) {
+async function checkForNewerVersion({
+  skip,
+  localPackageVersion,
+}: {
+  skip: boolean
+  localPackageVersion: string | undefined
+}) {
   if (skip) return false
 
   const packageName = process.env.npm_package_name
-  const localVersion = process.env.npm_package_version
 
-  if (!localVersion) return false
+  if (!localPackageVersion) return false
+
+  const updateCheckSpinner = ora(
+    `Checking for package updates from NPM`
+  ).start()
 
   const packageVersionFromNpm = await terminalPrompt(
     `npm view ${packageName} version`
   )
 
+  updateCheckSpinner.stop()
+
+  logger.info(`Latest version from NPM: ${packageVersionFromNpm}`)
+
   if (typeof packageVersionFromNpm !== "string") return false
 
+  // console.log(semver.lt(localPackageVersion, packageVersionFromNpm))
+
   const newerPackageAvailableFromNPM = semver.lt(
-    localVersion,
+    localPackageVersion,
     packageVersionFromNpm
   )
 
@@ -245,6 +260,8 @@ async function main({
 }: {
   restartAfterUpdate?: boolean
 }) {
+  const localPackageVersion = process.env.npm_package_version
+
   if (!restartAfterUpdate) {
     console.log(
       `
@@ -262,12 +279,16 @@ async function main({
 ************
   
 This is a collection of CLI utils used at ${nitro} 🔥
+${localPackageVersion}
   
 ************
     `)
   }
 
-  const updated = await checkForNewerVersion({ skip: restartAfterUpdate })
+  const updated = await checkForNewerVersion({
+    skip: restartAfterUpdate,
+    localPackageVersion,
+  })
 
   if (updated) {
     // Restart process
