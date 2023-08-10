@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.7
+
+### Patch Changes
+
+- f13ebd7: package.json access
+
 ## 0.0.6
 
 ### Patch Changes
