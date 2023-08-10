@@ -18,21 +18,34 @@ Access the tool via terminal
 $ nitro-cli
 ```
 
-## Contributing
+## Contributing for a release
 
 Easiest way to contribute is to open new issues for API suggestions and bugs.
 
-### Contributing for a release
+#### Internal users
 
-Steps for contributing through a pull request:
+```bash
+git clone git@github.com:nitrofi/nitro-cli-utils.git
+git switch dev # or alternatively create a feature branch
+npm run dev
+npm run start
+```
 
-- Fork `main` on Github and clone fork locally
-- Install dependencies
-  - `npm ci`
-- `npm run dev` to build changes
-- `npm run start` to run the CLI
-- Once all changes are complete, create a new release with [changesets](https://github.com/changesets/changesets)
-  - `npm run create-release`
-- Commit and push changes to fork
-- Open a pull request against the fork
-- If the PR needs changes before a merge to `main` can be made, push more changes to the fork until the PR is approved
+When all changes are done:
+
+```bash
+$ npm run create-release
+$ git add . && git commit && git push
+```
+
+Create PR on GitHub or with GitHub CLI
+
+```bash
+gh pr create --base main --head dev
+```
+
+If the PR needs changes before a merge to `main` can be made, push more changes to the working branch until the PR can be merged.
+
+#### External users
+
+Same as for internal users but PRs need to be created against a forked branch.
