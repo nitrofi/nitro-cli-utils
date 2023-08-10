@@ -222,7 +222,7 @@ async function checkForNewerVersion({ skip }: { skip: boolean }) {
 
   updateCheckSpinner.stop()
 
-  logger.info(`Latest version from NPM: ${packageVersionFromNpm}`)
+  logger.info(`Latest version available from NPM: ${packageVersionFromNpm}`)
 
   if (typeof packageVersionFromNpm !== "string") return false
 
