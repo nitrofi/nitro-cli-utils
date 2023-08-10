@@ -200,8 +200,6 @@ async function terminalPrompt(prompt: string) {
   })
 }
 
-// const PACKAGE_NAME =
-
 async function checkForNewerVersion({ skip }: { skip: boolean }) {
   if (skip) return false
 
@@ -216,16 +214,13 @@ async function checkForNewerVersion({ skip }: { skip: boolean }) {
 
   if (typeof packageVersionFromNpm !== "string") return false
 
-  // const newerPackageAvailableFromNPM = semver.lt(
-  //   localVersion,
-  //   packageVersionFromNpm
-  // )
-  const newerPackageAvailableFromNPM = true
-
-  // const updatePromt = await terminalPrompt(`npm i -g ${packageName}`)
+  const newerPackageAvailableFromNPM = semver.lt(
+    localVersion,
+    packageVersionFromNpm
+  )
 
   if (newerPackageAvailableFromNPM) {
-    logger.info("Newer package version available from NPM.")
+    logger.info("Newer package version available from NPM")
 
     const update = await promptUpdatePackage()
 
