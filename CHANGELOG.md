@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.5
+
+### Patch Changes
+
+- a317493: check for updates
+
 ## 0.0.4
 
 ### Patch Changes
