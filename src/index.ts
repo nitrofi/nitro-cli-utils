@@ -12,7 +12,7 @@ import fs from "fs-extra"
 import path from "path"
 import figlet from "figlet"
 import terminalLink from "terminal-link"
-import { exec, ExecException } from "child_process"
+import { exec, ExecException, spawn } from "child_process"
 import semver from "semver"
 import ora from "ora"
 import { toLowerCaseFirstLetter } from "./utils/utils"
@@ -257,15 +257,15 @@ async function updatePackage(): Promise<{ success: boolean }> {
 }
 
 async function checkForNewerVersion({ skip }: { skip: boolean }): Promise<{
-  updated: boolean
+  newPackageInstalled: boolean
 }> {
-  if (skip) return { updated: false }
+  if (skip) return { newPackageInstalled: false }
 
   const locallyInstalledGlobalVersion =
     await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
 
   if (typeof locallyInstalledGlobalVersion !== "string")
-    return { updated: false }
+    return { newPackageInstalled: false }
 
   const updateCheckSpinner = ora(
     `Checking for package updates from NPM`
@@ -277,25 +277,26 @@ async function checkForNewerVersion({ skip }: { skip: boolean }): Promise<{
 
   logger.info(`Latest version available from NPM: ${packageVersionFromNpm}`)
 
-  if (typeof packageVersionFromNpm !== "string") return { updated: false }
+  if (typeof packageVersionFromNpm !== "string")
+    return { newPackageInstalled: false }
 
   const newerPackageAvailableFromNPM = semver.lt(
     locallyInstalledGlobalVersion,
     packageVersionFromNpm
   )
 
-  if (!newerPackageAvailableFromNPM) return { updated: false }
+  if (!newerPackageAvailableFromNPM) return { newPackageInstalled: false }
 
   logger.info("Newer package version available from NPM")
 
   const updatePrompt = await promptUpdatePackage()
-  if (!updatePrompt) return { updated: false }
+  if (!updatePrompt) return { newPackageInstalled: false }
 
   const { success } = await updatePackage()
 
-  if (!success) return { updated: false }
+  if (!success) return { newPackageInstalled: false }
 
-  return { updated: true }
+  return { newPackageInstalled: true }
 }
 
 async function checkInstalledGlobalPackageVersion(packageName: string) {
@@ -332,6 +333,8 @@ async function main() {
    */
   const cliFlagUpdated = cliOptions.updated
 
+  if (cliFlagUpdated) logger.success("Running updated CLI tool")
+
   const globalVersion = await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
 
   if (!cliFlagUpdated) {
@@ -361,17 +364,22 @@ Locally installed package version: ${globalVersion}
     logger.info(`Running updated package version: ${globalVersion}`)
   }
 
-  const { updated } = await checkForNewerVersion({
+  const { newPackageInstalled } = await checkForNewerVersion({
     skip: cliFlagUpdated,
   })
 
-  if (updated) {
-    // Restart process after update
-    await terminalPrompt("nitro-cli --updated")
+  if (newPackageInstalled) {
+    // Spawn a child process to run updated package
+    spawn("nitro-cli --updated", {
+      stdio: "inherit",
+      shell: true,
+    })
+
+    // Exit stale package after child process has been terminated
     return
   }
 
-  if (!updated) {
+  if (!newPackageInstalled) {
     const cliProcesses = await promptCLIProcesses()
 
     cliProcesses.forEach(async (process) => {
