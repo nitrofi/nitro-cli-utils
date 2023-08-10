@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.14
+
+### Patch Changes
+
+- 7e16b74: spawn child process for updated package
+
 ## 0.0.13
 
 ### Patch Changes
