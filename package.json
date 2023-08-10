@@ -22,8 +22,10 @@
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "@types/figlet": "^1.5.6",
+    "@types/fs-extra": "^11.0.1",
     "@types/inquirer": "^9.0.3",
     "tsup": "^7.2.0",
+    "type-fest": "^4.2.0",
     "typescript": "^5.1.6"
   },
   "dependencies": {
@@ -31,6 +33,7 @@
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
+    "fs-extra": "^11.1.1",
     "inquirer": "^9.2.10",
     "ora": "^7.0.1",
     "semver": "^7.5.4",
