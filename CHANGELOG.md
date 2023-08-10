@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.11
+
+### Patch Changes
+
+- 1887c7b: added css module template
+
 ## 0.0.10
 
 ### Patch Changes
