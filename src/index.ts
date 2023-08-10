@@ -333,8 +333,6 @@ async function main() {
    */
   const cliFlagUpdated = cliOptions.updated
 
-  if (cliFlagUpdated) logger.success("Running updated CLI tool")
-
   const globalVersion = await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
 
   if (!cliFlagUpdated) {
