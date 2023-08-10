@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.6
+
+### Patch Changes
+
+- 8574546: better package version check
+
 ## 0.0.5
 
 ### Patch Changes
