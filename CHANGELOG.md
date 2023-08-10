@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.13
+
+### Patch Changes
+
+- c9187c1: added boilerplate command
+
 ## 0.0.12
 
 ### Patch Changes
