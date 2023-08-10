@@ -202,20 +202,23 @@ async function terminalPrompt(prompt: string) {
   })
 }
 
+async function getNPMPackageVersion() {
+  return await terminalPrompt(`npm view ${PACKAGE_NAME} version`)
+}
+
 async function checkForNewerVersion({ skip }: { skip: boolean }) {
   if (skip) return false
 
-  const globalVersion = await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
+  const locallyInstalledGlobalVersion =
+    await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
 
-  if (typeof globalVersion !== "string") return false
+  if (typeof locallyInstalledGlobalVersion !== "string") return false
 
   const updateCheckSpinner = ora(
     `Checking for package updates from NPM`
   ).start()
 
-  const packageVersionFromNpm = await terminalPrompt(
-    `npm view ${PACKAGE_NAME} version`
-  )
+  const packageVersionFromNpm = await getNPMPackageVersion()
 
   updateCheckSpinner.stop()
 
@@ -224,7 +227,7 @@ async function checkForNewerVersion({ skip }: { skip: boolean }) {
   if (typeof packageVersionFromNpm !== "string") return false
 
   const newerPackageAvailableFromNPM = semver.lt(
-    globalVersion,
+    locallyInstalledGlobalVersion,
     packageVersionFromNpm
   )
 
@@ -257,7 +260,9 @@ async function checkInstalledGlobalPackageVersion(packageName: string) {
   if (typeof grepResult !== "string") return
 
   const semverPattern = new RegExp(/[0-9\.]+/)
-  const version = grepResult.match(semverPattern)
+  const version = grepResult.match(semverPattern)?.[0]
+
+  if (typeof version !== "string") return
 
   return version
 }
@@ -286,7 +291,7 @@ async function main({
 ************
   
 This is a collection of CLI utils used at ${nitro} 🔥
-${globalVersion}
+Locally installed package version: ${globalVersion}
   
 ************
     `)
