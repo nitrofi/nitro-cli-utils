@@ -7,13 +7,14 @@ import {
   uiComponenentStoryTemplate,
   uiComponenentTemplate,
 } from "./templates/templates"
-import fs from "fs"
+import fs from "fs-extra"
 import path from "path"
 import figlet from "figlet"
 import terminalLink from "terminal-link"
 import { exec } from "child_process"
 import semver from "semver"
 import ora from "ora"
+import { PackageJson } from "type-fest"
 
 type CLIProcesses = "dato-block-scaffold"
 
@@ -200,16 +201,10 @@ async function terminalPrompt(prompt: string) {
   })
 }
 
-async function checkForNewerVersion({
-  skip,
-  localPackageVersion,
-}: {
-  skip: boolean
-  localPackageVersion: string | undefined
-}) {
+async function checkForNewerVersion({ skip }: { skip: boolean }) {
   if (skip) return false
 
-  const packageName = process.env.npm_package_name
+  const { version: localPackageVersion, name: packageName } = packgeJson()
 
   if (!localPackageVersion) return false
 
@@ -226,8 +221,6 @@ async function checkForNewerVersion({
   logger.info(`Latest version from NPM: ${packageVersionFromNpm}`)
 
   if (typeof packageVersionFromNpm !== "string") return false
-
-  // console.log(semver.lt(localPackageVersion, packageVersionFromNpm))
 
   const newerPackageAvailableFromNPM = semver.lt(
     localPackageVersion,
@@ -255,13 +248,17 @@ async function checkForNewerVersion({
   return false
 }
 
+function packgeJson() {
+  return fs.readJSONSync(
+    path.join(process.cwd(), "package.json")
+  ) as PackageJson
+}
+
 async function main({
   restartAfterUpdate = false,
 }: {
   restartAfterUpdate?: boolean
 }) {
-  const localPackageVersion = process.env.npm_package_version
-
   if (!restartAfterUpdate) {
     console.log(
       `
@@ -279,7 +276,7 @@ async function main({
 ************
   
 This is a collection of CLI utils used at ${nitro} 🔥
-${localPackageVersion}
+${packgeJson().version}
   
 ************
     `)
@@ -287,7 +284,6 @@ ${localPackageVersion}
 
   const updated = await checkForNewerVersion({
     skip: restartAfterUpdate,
-    localPackageVersion,
   })
 
   if (updated) {
