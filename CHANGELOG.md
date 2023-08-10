@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.8
+
+### Patch Changes
+
+- a8320c4: global version with grep
+
 ## 0.0.7
 
 ### Patch Changes
