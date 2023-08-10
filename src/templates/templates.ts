@@ -1,3 +1,5 @@
+import { toLowerCaseFirstLetter } from "../utils/utils"
+
 export const datoBlockTemplate = ({
   componentName,
 }: {
@@ -18,16 +20,34 @@ export function DatoBlock${componentName}({ fragment }: DatoBlock${componentName
 
 export const uiComponenentTemplate = ({
   componentName,
+  hasCssModule,
 }: {
   componentName: string
+  hasCssModule: boolean
 }) => `
+${
+  hasCssModule
+    ? `import styles from "./${toLowerCaseFirstLetter(
+        componentName
+      )}.module.css"`
+    : ""
+}
+
 export type ${componentName}Props = {}
 
 /**
  * Function description (JSDoc)
  */
 export function ${componentName}(props: ${componentName}Props) {
-  return null
+  return (
+    <div${
+      hasCssModule
+        ? ` className={styles.${toLowerCaseFirstLetter(componentName)}}`
+        : ""
+    }>
+  
+    </div>
+  )
 }
 `
 
@@ -70,5 +90,15 @@ export const datoBlockFragmentTemplate = ({
 }) => `
 fragment ${componentName} on ${componentName}Record {
   __typename
+}
+`
+
+export const cssModuleTemplate = ({
+  componentName,
+}: {
+  componentName: string
+}) => `
+.${toLowerCaseFirstLetter(componentName)} {
+
 }
 `
