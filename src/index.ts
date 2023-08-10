@@ -14,9 +14,10 @@ import terminalLink from "terminal-link"
 import { exec } from "child_process"
 import semver from "semver"
 import ora from "ora"
-import { PackageJson } from "type-fest"
 
 type CLIProcesses = "dato-block-scaffold"
+
+const PACKAGE_NAME = "@nitrofi/cli-utils"
 
 const promptCLIProcesses = async (): Promise<CLIProcesses[]> =>
   checkbox({
@@ -204,16 +205,16 @@ async function terminalPrompt(prompt: string) {
 async function checkForNewerVersion({ skip }: { skip: boolean }) {
   if (skip) return false
 
-  const { version: localPackageVersion, name: packageName } = packgeJson()
+  const globalVersion = await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
 
-  if (!localPackageVersion) return false
+  if (typeof globalVersion !== "string") return false
 
   const updateCheckSpinner = ora(
     `Checking for package updates from NPM`
   ).start()
 
   const packageVersionFromNpm = await terminalPrompt(
-    `npm view ${packageName} version`
+    `npm view ${PACKAGE_NAME} version`
   )
 
   updateCheckSpinner.stop()
@@ -223,7 +224,7 @@ async function checkForNewerVersion({ skip }: { skip: boolean }) {
   if (typeof packageVersionFromNpm !== "string") return false
 
   const newerPackageAvailableFromNPM = semver.lt(
-    localPackageVersion,
+    globalVersion,
     packageVersionFromNpm
   )
 
@@ -233,9 +234,9 @@ async function checkForNewerVersion({ skip }: { skip: boolean }) {
     const update = await promptUpdatePackage()
 
     if (update) {
-      const spinner = ora(`Updating ${packageName}`).start()
+      const spinner = ora(`Updating ${PACKAGE_NAME}`).start()
 
-      const updatePrompt = await terminalPrompt(`npm i -g ${packageName}`)
+      const updatePrompt = await terminalPrompt(`npm i -g ${PACKAGE_NAME}`)
 
       spinner.stop()
 
@@ -248,10 +249,17 @@ async function checkForNewerVersion({ skip }: { skip: boolean }) {
   return false
 }
 
-function packgeJson() {
-  return fs.readJSONSync(
-    path.join(process.cwd(), "package.json")
-  ) as PackageJson
+async function checkInstalledGlobalPackageVersion(packageName: string) {
+  const grepResult = await terminalPrompt(
+    `npm list --depth=0 -g | grep  ${packageName}`
+  )
+
+  if (typeof grepResult !== "string") return
+
+  const semverPattern = new RegExp(/[0-9\.]+/)
+  const version = grepResult.match(semverPattern)
+
+  return version
 }
 
 async function main({
@@ -259,6 +267,8 @@ async function main({
 }: {
   restartAfterUpdate?: boolean
 }) {
+  const globalVersion = await checkInstalledGlobalPackageVersion(PACKAGE_NAME)
+
   if (!restartAfterUpdate) {
     console.log(
       `
@@ -276,7 +286,7 @@ async function main({
 ************
   
 This is a collection of CLI utils used at ${nitro} 🔥
-${packgeJson().version}
+${globalVersion}
   
 ************
     `)
