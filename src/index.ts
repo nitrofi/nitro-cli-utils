@@ -2,6 +2,7 @@
 import { checkbox, confirm, input } from "@inquirer/prompts"
 import { logger } from "./utils/logger"
 import {
+  cssModuleTemplate,
   datoBlockFragmentTemplate,
   datoBlockTemplate,
   uiComponenentStoryTemplate,
@@ -14,6 +15,7 @@ import terminalLink from "terminal-link"
 import { exec } from "child_process"
 import semver from "semver"
 import ora from "ora"
+import { toLowerCaseFirstLetter } from "./utils/utils"
 
 type CLIProcesses = "dato-block-scaffold"
 
@@ -34,6 +36,7 @@ const promptCLIProcesses = async (): Promise<CLIProcesses[]> =>
 type DatoComponentFiles =
   | "dato-block"
   | "ui-component"
+  | "css-module"
   | "graphql-fragment"
   | "storybook-story"
 
@@ -49,6 +52,11 @@ const promptDatoComponentFiles = async (): Promise<DatoComponentFiles[]> =>
       {
         name: "UI component",
         value: "ui-component",
+        checked: true,
+      },
+      {
+        name: "CSS module",
+        value: "css-module",
         checked: true,
       },
       {
@@ -112,6 +120,8 @@ export function createFolder({ folderPath }: { folderPath: string }) {
 async function createDatoBlockScaffold() {
   const datoComponents = await promptDatoComponentFiles()
 
+  const hasCssModule = datoComponents.includes("css-module")
+
   await promptUseDefaultPaths()
 
   let componentName = await promptComponentName()
@@ -136,7 +146,7 @@ async function createDatoBlockScaffold() {
         break
       }
       case "ui-component": {
-        const template = uiComponenentTemplate({ componentName })
+        const template = uiComponenentTemplate({ componentName, hasCssModule })
 
         const folderPath = `src/components/ui/${componentName}`
         createFolder({
@@ -157,7 +167,7 @@ async function createDatoBlockScaffold() {
 
         const folderPath = `src/components/ui/${componentName}/stories`
         createFolder({
-          folderPath: `src/components/ui/${componentName}/stories`,
+          folderPath,
         })
 
         const filePath = `${folderPath}/${componentName}.stories.tsx`
@@ -174,10 +184,29 @@ async function createDatoBlockScaffold() {
 
         const folderPath = `src/graphql/dato/operations/queries/fragments`
         createFolder({
-          folderPath: `src/graphql/dato/operations/queries/fragments`,
+          folderPath,
         })
 
         const filePath = `${folderPath}/${componentName}.fragment.graphql`
+        writeLocalFile({
+          filePath,
+          data: template,
+        })
+
+        logger.success(`✅ ${filePath}`)
+        break
+      }
+      case "css-module": {
+        const template = cssModuleTemplate({ componentName })
+
+        const folderPath = `src/components/ui/${componentName}`
+        createFolder({
+          folderPath,
+        })
+
+        const filePath = `${folderPath}/${toLowerCaseFirstLetter(
+          componentName
+        )}.module.css`
         writeLocalFile({
           filePath,
           data: template,
