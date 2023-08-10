@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.10
+
+### Patch Changes
+
+- b397ff2: small logging change for testing
+
 ## 0.0.9
 
 ### Patch Changes
