@@ -11,6 +11,9 @@ import fs from "fs"
 import path from "path"
 import figlet from "figlet"
 import terminalLink from "terminal-link"
+import { exec } from "child_process"
+import semver from "semver"
+import ora from "ora"
 
 type CLIProcesses = "dato-block-scaffold"
 
@@ -65,6 +68,11 @@ const promptUseDefaultPaths = async () => {
   })
   if (!useDefaultPaths) logger.warn("Custom file paths not supported!")
 }
+
+const promptUpdatePackage = async () =>
+  await confirm({
+    message: "Do you want to update package to latest version?",
+  })
 
 const promptComponentName = async () => {
   const userInput = () =>
@@ -180,35 +188,109 @@ async function createDatoBlockScaffold() {
   })
 }
 
-async function main() {
-  console.log(
-    `
-    `
-  )
-  console.log(
-    figlet.textSync("Nitro", {
-      font: "ANSI Regular",
+async function terminalPrompt(prompt: string) {
+  return await new Promise((resolve, reject) => {
+    exec(prompt, (error, stdout, stderr) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(stdout)
+      }
     })
-  )
-
-  const nitro = terminalLink("Nitro", "https://nitro.fi")
-
-  logger.success(`************
-
-This is a collection of CLI utils used at ${nitro} 🔥
-
-************
-  `)
-
-  const cliProcesses = await promptCLIProcesses()
-
-  cliProcesses.forEach(async (process) => {
-    switch (process) {
-      case "dato-block-scaffold":
-        await createDatoBlockScaffold()
-        break
-    }
   })
 }
 
-main()
+// const PACKAGE_NAME =
+
+async function checkForNewerVersion({ skip }: { skip: boolean }) {
+  if (skip) return false
+
+  const packageName = process.env.npm_package_name
+  const localVersion = process.env.npm_package_version
+
+  if (!localVersion) return false
+
+  const packageVersionFromNpm = await terminalPrompt(
+    `npm view ${packageName} version`
+  )
+
+  if (typeof packageVersionFromNpm !== "string") return false
+
+  // const newerPackageAvailableFromNPM = semver.lt(
+  //   localVersion,
+  //   packageVersionFromNpm
+  // )
+  const newerPackageAvailableFromNPM = true
+
+  // const updatePromt = await terminalPrompt(`npm i -g ${packageName}`)
+
+  if (newerPackageAvailableFromNPM) {
+    logger.info("Newer package version available from NPM.")
+
+    const update = await promptUpdatePackage()
+
+    if (update) {
+      const spinner = ora(`Updating ${packageName}`).start()
+
+      const updatePrompt = await terminalPrompt(`npm i -g ${packageName}`)
+
+      spinner.stop()
+
+      console.log(updatePrompt)
+    }
+
+    return true
+  }
+
+  return false
+}
+
+async function main({
+  restartAfterUpdate = false,
+}: {
+  restartAfterUpdate?: boolean
+}) {
+  if (!restartAfterUpdate) {
+    console.log(
+      `
+      `
+    )
+    console.log(
+      figlet.textSync("Nitro", {
+        font: "ANSI Regular",
+      })
+    )
+
+    const nitro = terminalLink("Nitro", "https://nitro.fi")
+
+    logger.success(`
+************
+  
+This is a collection of CLI utils used at ${nitro} 🔥
+  
+************
+    `)
+  }
+
+  const updated = await checkForNewerVersion({ skip: restartAfterUpdate })
+
+  if (updated) {
+    // Restart process
+    main({ restartAfterUpdate: true })
+    return
+  }
+
+  if (!updated) {
+    const cliProcesses = await promptCLIProcesses()
+
+    cliProcesses.forEach(async (process) => {
+      switch (process) {
+        case "dato-block-scaffold":
+          await createDatoBlockScaffold()
+          break
+      }
+    })
+  }
+}
+
+main({})

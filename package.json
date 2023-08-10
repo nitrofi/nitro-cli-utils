@@ -32,6 +32,8 @@
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
     "inquirer": "^9.2.10",
+    "ora": "^7.0.1",
+    "semver": "^7.5.4",
     "terminal-link": "^3.0.0"
   }
 }
