@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.16
+
+### Patch Changes
+
+- 867394f: remove double updated package log
+
 ## 0.0.15
 
 ### Patch Changes
