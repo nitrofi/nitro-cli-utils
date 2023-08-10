@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.9
+
+### Patch Changes
+
+- 2104de1: fix local package version check
+
 ## 0.0.8
 
 ### Patch Changes
