@@ -18,7 +18,7 @@ import ora from "ora"
 import { toLowerCaseFirstLetter } from "./utils/utils"
 import { program } from "commander"
 
-type CLIProcesses = "dato-block-scaffold"
+type CLIProcesses = "dato-block-scaffold" | "new-process"
 
 const PACKAGE_NAME = "@nitrofi/cli-utils"
 
@@ -30,6 +30,11 @@ const promptCLIProcesses = async (): Promise<CLIProcesses[]> =>
         name: "React Dato component scaffold",
         value: "dato-block-scaffold",
         checked: true,
+      },
+      {
+        name: "Add your own commands",
+        value: "new-process",
+        checked: false,
       },
     ],
   })
@@ -373,6 +378,9 @@ Locally installed package version: ${globalVersion}
       switch (process) {
         case "dato-block-scaffold":
           await createDatoBlockScaffold()
+          break
+        case "new-process":
+          logger.success("Follow collaboration guide in README.md")
           break
       }
     })
