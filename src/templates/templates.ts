@@ -64,23 +64,36 @@ const meta: Meta<typeof ${componentName}> = {
   title: 'ui/${componentName}',
   component: ${componentName},
   tags: ["autodocs"],
+  /* Parameters for all stories. Can be defined also per story. */
+  parameters: {
+    /* Opens story in a predefined layout (needs to be defined in .storybook/preview.js) */
+    // viewport: {
+    //   defaultViewport: 'xs',
+    // },
+    /* Removes padding in stories */
+    layout: "fullscreen",
+  },
 }
 
 export default meta
 
 type Story = StoryObj<typeof ${componentName}>
 
-export const Default: Story & { args: ${componentName}Props }  = {
+/**
+ * Use this export easily when composing stories.
+ *
+ * @example
+ *
+ * <${componentName} {...${componentName}StoryDefault.args} />
+ */
+export const ${componentName}StoryDefault: Story & {
+  /* Extending the Story type fixes problems with incorrect types when composing stories */
+  args: ${componentName}Props
+} = {
+  name: "Default",
   args: {
-    
-  }
-}
 
-Default.parameters = {
-  // viewport: {
-  //   defaultViewport: 'xs',
-  // },
-  // layout: 'fullscreen',
+  },
 }
 `
 
