@@ -6,6 +6,7 @@ export const datoBlockTemplate = ({
   componentName: string
 }) => `
 import { Dato } from "@/graphql/dato/__generated__/types"
+import { ${componentName} } from "@/components/ui/${componentName}/${componentName}"
 
 type DatoBlock${componentName}Props = { fragment: Dato.${componentName}Fragment }
 
@@ -14,7 +15,7 @@ type DatoBlock${componentName}Props = { fragment: Dato.${componentName}Fragment 
  */
 export function DatoBlock${componentName}({ fragment }: DatoBlock${componentName}Props) {
 
-  return null
+  return <${componentName} />
 }
 `
 
@@ -69,7 +70,7 @@ export default meta
 
 type Story = StoryObj<typeof ${componentName}>
 
-export const Default: Story { args: ${componentName}Props }  = {
+export const Default: Story & { args: ${componentName}Props }  = {
   args: {
     
   }
