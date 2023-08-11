@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.18
+
+### Patch Changes
+
+- ddde16d: change story template
+
 ## 0.0.17
 
 ### Patch Changes
