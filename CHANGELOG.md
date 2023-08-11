@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.17
+
+### Patch Changes
+
+- 22e5888: fixes to templates
+
 ## 0.0.16
 
 ### Patch Changes
