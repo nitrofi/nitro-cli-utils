@@ -5,6 +5,7 @@ export const datoBlockTemplate = ({
 }: {
   componentName: string
 }) => `
+import "server-only"
 import { Dato } from "@/graphql/dato/__generated__/types"
 import { ${componentName} } from "@/components/ui/${componentName}/${componentName}"
 
@@ -26,6 +27,7 @@ export const uiComponenentTemplate = ({
   componentName: string
   hasCssModule: boolean
 }) => `
+import "server-only"
 ${
   hasCssModule
     ? `import styles from "./${toLowerCaseFirstLetter(
