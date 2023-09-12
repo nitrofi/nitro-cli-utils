@@ -1,5 +1,11 @@
 # @nitrofi/cli-utils
 
+## 0.0.19
+
+### Patch Changes
+
+- 9319455: added import "server-only"
+
 ## 0.0.18
 
 ### Patch Changes
